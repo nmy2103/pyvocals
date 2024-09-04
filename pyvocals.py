@@ -143,6 +143,82 @@ def get_vocal_states(p1, p2,  p1_label = 'Child', p2_label = 'Parent', start_tim
             p2_label: p2_vocal_states})
         return dyad
 
+def get_vocal_turns(p1, p2, fs = 4, max_pause_duration = 3):
+    """
+    Identify indices of when each person's vocal turn begins and ends.
+    
+    Parameters
+    ----------
+    p1 : array_like
+        An array containing the first partner's vocal states.
+    p2 : array_like
+        An array containing the second partner's vocal states.
+    fs : int, float
+        The sampling rate of the vocalization instances.
+    max_pause_duration : int, float
+        The maximum allowable duration of a pause (in seconds) 
+        during which a vocal turn is still considered valid.
+        
+    Returns
+    -------
+    p1_turns : list
+        A list of tuples containing indices denoting the start and end of 
+        the first partner's vocal turn.
+    p2_turns : list
+        A list of tuples containing indices denoting the start and end of
+        the second partner's vocal turn.
+    """
+    if len(p1) != len(p2):
+        raise Exception('The lengths of `p1` and `p2` must be equal.')
+    
+    p1_turns = []
+    p2_turns = []
+    total_duration = len(p1)
+    max_pause = int(max_pause_duration * fs)
+    
+    n = 0
+    while n < total_duration:
+        is_turn = False
+        
+        # Get partner 1's turns
+        if p1[n] == 1 and p2[n] == 2:
+            p1_start_ix = n
+            for m in range(p1_start_ix, total_duration):
+                if (p1[m] == 2 or p1[m] == 3) and p2[m] == 2:
+                    pause_end = m + max_pause
+                    for p in range(m, min(pause_end, total_duration)):
+                        if p2[p] == 1 and p1[p] == 2:
+                            p2_start_ix = p
+                            p1_turns.append((p1_start_ix, p2_start_ix))
+                            n = p2_start_ix
+                            is_turn = True
+                            break
+                    if is_turn:
+                        break
+            if is_turn:
+                continue
+        
+        # Get partner 2's turns
+        if p2[n] == 1 and p1[n] == 2:
+            p2_start_ix = n
+            for m in range(p2_start_ix, total_duration):
+                if (p2[m] == 2 or p2[m] == 3) and p1[m] == 2:
+                    pause_end = m + max_pause
+                    for p in range(m, min(pause_end, total_duration)):
+                        if p1[p] == 1 and p2[p] == 2:
+                            p1_start_ix = p
+                            p2_turns.append((p2_start_ix, p1_start_ix))
+                            n = p1_start_ix
+                            is_turn = True
+                            break
+                    if is_turn:
+                        break
+            if is_turn:
+                continue
+                
+        n += 1
+    return p1_turns, p2_turns
+
 def plot_vocals(p1, p2, fs, seg_num = 1, seg_size = 15, 
                 p1_label = 'Child', p2_label = 'Parent'):
     """
