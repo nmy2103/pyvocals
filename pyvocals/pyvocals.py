@@ -1,10 +1,15 @@
+from typing import Optional, Sequence, Tuple, Union
+from matplotlib.patches import Rectangle
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import librosa
-import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
 
-def preprocess_audio(file, start_time = None, target_fs = 4):
+def preprocess_audio(
+    file: str, 
+    start_time: Optional[datetime.datetime] = None, 
+    target_fs: int = 4
+) -> np.ndarray:
     """
     Pre-process vocalization data from a social partner's audio file into 
     vocalization instances.
@@ -23,7 +28,7 @@ def preprocess_audio(file, start_time = None, target_fs = 4):
 
     Returns
     -------
-    signal : array_like
+    signal : array-like
         An array containing the pre-processed vocalization signal.
     """
     raw, orig_fs = librosa.load(file, sr = None)
@@ -41,7 +46,14 @@ def preprocess_audio(file, start_time = None, target_fs = 4):
         signal = signal.resample(f'{int(1000 / target_fs)}ms').first()
     return signal
 
-def get_vocal_states(p1, p2,  p1_label = 'Child', p2_label = 'Parent', start_time = None, fs = None):
+def get_vocal_states(
+    p1: Union[np.ndarray, Sequence[int]],  
+    p2: Union[np.ndarray, Sequence[int]],  
+    p1_label: str = 'Child', 
+    p2_label: str = 'Parent', 
+    start_time: Optional[datetime.datetime] = None,  
+    fs: Optional[int] = None  
+) -> Union[Tuple[np.ndarray, np.ndarray], pd.DataFrame]:
     """
     Process vocalization instances of a dyad into vocal states. Numeric
     values of vocal states are as follows: 1 = Vocalization; 2 = Pause;
@@ -50,10 +62,10 @@ def get_vocal_states(p1, p2,  p1_label = 'Child', p2_label = 'Parent', start_tim
 
     Parameters
     ----------
-    p1 : array_like
+    p1 : array-like
         An array containing occurrences (`1`) and non-occurrences (`0`) of
         the first partner's vocalizations.
-    p2 : array_like
+    p2 : array-like
         An array containing occurrences (`1`) and non-occurrences (`0`) of
         the second partner's vocalizations.
     p1_label : str, optional
@@ -94,10 +106,15 @@ def get_vocal_states(p1, p2,  p1_label = 'Child', p2_label = 'Parent', start_tim
             'The sampling rate `fs` must be provided if a start time '
             'is given.')
 
+    if not isinstance(p1, np.ndarray):
+        p1 = np.array(p1)
+    if not isinstance(p2, np.ndarray):
+        p2 = np.array(p2)
+
     # Get all vocal states
-    p1_iss, p1_nss, p2_iss, p2_nss = get_simultaneous_speech(p1, p2)
-    p1_pauses, p2_pauses = get_pauses(p1, p2)
-    p1_switch_pauses, p2_switch_pauses = get_switching_pauses(p1, p2)
+    p1_iss, p1_nss, p2_iss, p2_nss = find_simultaneous_speech(p1, p2)
+    p1_pauses, p2_pauses = find_pauses(p1, p2)
+    p1_switch_pauses, p2_switch_pauses = find_switching_pauses(p1, p2)
 
     # Pre-process partner 1
     p1_voc = np.where(p1 == 1)[0]
@@ -143,7 +160,7 @@ def get_vocal_states(p1, p2,  p1_label = 'Child', p2_label = 'Parent', start_tim
             p2_label: p2_vocal_states})
         return dyad
 
-def get_vocal_turns(p1, p2, fs = 4, max_pause_duration = 5):
+def find_vocal_turns(p1, p2, fs = 4, max_pause_duration = 5):
     """
     Identify indices of when each person's vocal and simultaneous speech 
     turns begin and end.
@@ -272,8 +289,91 @@ def get_vocal_turns(p1, p2, fs = 4, max_pause_duration = 5):
         n += 1
     return p1_voc_turns, p1_ss_turns, p2_voc_turns, p2_ss_turns
 
-def plot_vocals(p1, p2, fs, seg_num = 1, seg_size = 15, 
-                p1_label = 'Child', p2_label = 'Parent'):
+def extract_features(
+    p1: Union[np.ndarray, Sequence[int]], 
+    p2: Union[np.ndarray, Sequence[int]], 
+    p1_label: str = 'Child', 
+    p2_label: str = 'Parent', 
+    start_time: Optional[datetime.datetime] = None,
+    fs: Optional[int] = None
+) -> Dict[str, Union[np.ndarray, pd.DataFrame, list]]:
+    """
+    Extract Switching and Interruptive Turns for each social partner.
+    
+    Parameters
+    ----------
+    p1 : array-like
+        An array containing occurrences (`1`) and non-occurrences (`0`) of
+        the first partner's vocalizations.
+    p2 : array-like
+        An array containing occurrences (`1`) and non-occurrences (`0`) of
+        the second partner's vocalizations.
+    p1_label : str, optional
+        The name of the first partner; by default, 'Child'.
+    p2_label : str, optional
+        The name of the second partner; by default, 'Parent'.
+    start_time : datetime.datetime, optional
+        A `datetime` value denoting the start time of the vocalization data.
+    fs : int, optional
+        The sampling rate of the vocalization instances. This value must be 
+        provided if `start_time` is not `None`.
+
+    Returns
+    -------
+    dyad_vocals : pandas.DataFrame
+        A DataFrame containing each partner's time series of extracted vocal 
+        states and turn-taking features.
+    """
+    
+    def mark_turns(row):
+        """Mark turns across all rows."""
+        for key, turns in row.items():
+            for start, end in turns:
+                dyad_vocals.loc[start:end, key] = 1
+                
+    # Get vocal states
+    vocal_states = get_vocal_states(p1, p2, start_time=start_time, fs = fs)
+
+    if isinstance(vocal_states, tuple):
+        p1_vocal_states, p2_vocal_states = vocal_states
+    else:
+        p1_vocal_states = vocal_states.iloc[:, 1].values
+        p2_vocal_states = vocal_states.iloc[:, 2].values
+
+    # Get indices of vocal turns
+    vocal_turns = find_vocal_turns(p1_vocal_states, p2_vocal_states, fs = fs)
+
+    # Get STs and ITs
+    if isinstance(vocal_states, pd.DataFrame):
+        dyad_vocals = vocal_states.copy()
+    else:
+        dyad_vocals = pd.DataFrame({
+            p1_label: p1_vocal_states,
+            p2_label: p2_vocal_states,
+        })
+    for turn in [vocal_turns[0], vocal_turns[1], 
+                 vocal_turns[2], vocal_turns[3]]:
+        for (start, end) in turn:
+            if turn is vocal_turns[0]:
+                dyad_vocals.loc[start:end, f'{p1_label}_ST'] = 1
+            elif turn is vocal_turns[1]:
+                dyad_vocals.loc[start:end, f'{p1_label}_IT'] = 1
+            elif turn is vocal_turns[2]:
+                dyad_vocals.loc[start:end, f'{p2_label}_ST'] = 1
+            else:
+                dyad_vocals.loc[start:end, f'{p2_label}_IT'] = 1
+                
+    return dyad_vocals
+
+def plot_vocals(
+    p1: Union[np.ndarray, Sequence[int]],  
+    p2: Union[np.ndarray, Sequence[int]],  
+    fs: int,  
+    seg_num: int = 1,  
+    seg_size: int = 15,  
+    p1_label: str = 'Child',  
+    p2_label: str = 'Parent'  
+) -> Figure:
     """
     Visualize two social partners' vocalization time series.
     
@@ -371,7 +471,10 @@ def plot_vocals(p1, p2, fs, seg_num = 1, seg_size = 15,
     fig.tight_layout()
     return fig
 
-def get_pauses(p1, p2):
+def find_pauses(
+    p1: Union[np.ndarray, Sequence[int]],  
+    p2: Union[np.ndarray, Sequence[int]]
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Identify indices of two social partners' pause occurrences.
     
@@ -386,9 +489,9 @@ def get_pauses(p1, p2):
         
     Returns
     -------
-    pauses1 : array_like
+    pauses1 : array-like
         An array containing indices of the first partner's pauses.
-    pauses2: array_like
+    pauses2: array-like
         An array containing indices of the second partner's pauses.
         
     Example
@@ -432,24 +535,27 @@ def get_pauses(p1, p2):
         
         return p1_pauses, p2_pauses
     
-def get_switching_pauses(p1, p2):
+def find_switching_pauses(
+    p1: Union[np.ndarray, Sequence[int]],  
+    p2: Union[np.ndarray, Sequence[int]]
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Identify indices of two social partners' switching pause occurrences.
     
     Parameters
     ----------
-    p1 : array_like
+    p1 : array-like
         An array containing occurrences (`1`) and non-occurrences (`0`) of 
         the first partner's vocalizations.
-    p2 : array_like
+    p2 : array-like
         An array containing occurrences (`1`) and non-occurrences (`0`) of 
         the second partner's vocalizations.
         
     Returns
     -------
-    p1_switching_pauses : array_like
+    p1_switching_pauses : array-like
         An array containing indices of the first partner's switching pauses.
-    p2_switching_pauses : array_like
+    p2_switching_pauses : array-like
         An array containing indices of the second partner's switching pauses.
     """
 
@@ -518,7 +624,10 @@ def get_switching_pauses(p1, p2):
 
         return p1_switching_pauses, p2_switching_pauses
 
-def get_simultaneous_speech(p1, p2):
+def find_simultaneous_speech(
+    p1: Union[np.ndarray, Sequence[int]],  
+    p2: Union[np.ndarray, Sequence[int]]
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Identify indices of two social partners' interruptive (ISS) and 
     non-interruptive simultaneous speech (NSS) occurrences.
@@ -534,13 +643,13 @@ def get_simultaneous_speech(p1, p2):
         
     Returns
     -------
-    p1_iss : array_like
+    p1_iss : array-like
         An array containing indices of the first partner's ISS occurrences.
-    p1_nss : array_like
+    p1_nss : array-like
         An array containing indices of the first partner's NSS occurrences.
-    p2_iss : array_like
+    p2_iss : array-like
         An array containing indices of the second partner's ISS occurrences.
-    p2_nss : array_like
+    p2_nss : array-like
         An array containing indices of the second partner's NSS occurrences.
     """
 
