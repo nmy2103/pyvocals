@@ -1,5 +1,6 @@
-from typing import Optional, Sequence, Tuple, Union
+from typing import Dict, Optional, Sequence, Tuple, Union
 from matplotlib.patches import Rectangle
+from datetime import datetime
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -7,7 +8,7 @@ import librosa
 
 def preprocess_audio(
     file: str, 
-    start_time: Optional[datetime.datetime] = None, 
+    start_time: Optional[datetime] = None,
     target_fs: int = 4
 ) -> np.ndarray:
     """
@@ -31,7 +32,13 @@ def preprocess_audio(
     signal : array-like
         An array containing the pre-processed vocalization signal.
     """
-    raw, orig_fs = librosa.load(file, sr = None)
+    try:
+        raw, orig_fs = librosa.load(file, sr = None)
+    except Exception as e:
+        raise ValueError(
+            f'Could not load {file}. Ensure it\'s a valid audio file and '
+            f'`ffmpeg` or `sox` is installed for non-WAV formats. Error: {e}')
+
     signal = raw.copy()
     signal[signal != 0] = 1
     if start_time is None:
@@ -51,7 +58,7 @@ def get_vocal_states(
     p2: Union[np.ndarray, Sequence[int]],  
     p1_label: str = 'Child', 
     p2_label: str = 'Parent', 
-    start_time: Optional[datetime.datetime] = None,  
+    start_time: Optional[datetime] = None,
     fs: Optional[int] = None  
 ) -> Union[Tuple[np.ndarray, np.ndarray], pd.DataFrame]:
     """
@@ -99,6 +106,10 @@ def get_vocal_states(
         'Timestamp': Timestamped intervals.
         'P1': The first partner's processed vocal states.
         'P2': The second partner's processed vocal states.
+
+    References
+    ----------
+    Jaffe, J., & Feldstein, S. (1970). Rhythms of dialogue. Academic Press.
     """
 
     if start_time is not None and fs is None:
@@ -294,7 +305,7 @@ def extract_features(
     p2: Union[np.ndarray, Sequence[int]], 
     p1_label: str = 'Child', 
     p2_label: str = 'Parent', 
-    start_time: Optional[datetime.datetime] = None,
+    start_time: Optional[datetime] = None,
     fs: Optional[int] = None
 ) -> Dict[str, Union[np.ndarray, pd.DataFrame, list]]:
     """
@@ -373,7 +384,7 @@ def plot_vocals(
     seg_size: int = 15,  
     p1_label: str = 'Child',  
     p2_label: str = 'Parent'  
-) -> Figure:
+) -> plt.figure:
     """
     Visualize two social partners' vocalization time series.
     
