@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="generator" content="mkdocs-1.6.1, mkdocs-terminal-4.7.0">
+     
+     
+    <link rel="icon" type="image/png" sizes="192x192" href="../img/android-chrome-192x192.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="../img/android-chrome-512x512.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="../img/apple-touch-icon.png" />
+<link rel="shortcut icon" type="image/png" sizes="48x48" href="../img/favicon.ico" />
+<link rel="icon" type="image/png" sizes="16x16" href="../img/favicon-16x16.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="../img/favicon-32x32.png" />
+
+
+    
+ 
+<title>API Reference - pyvocals Documentation</title>
+
+
+<link href="../css/fontawesome/css/fontawesome.min.css" rel="stylesheet">
+<link href="../css/fontawesome/css/solid.min.css" rel="stylesheet">
+<link href="../css/normalize.css" rel="stylesheet">
+<link href="../css/terminal.css" rel="stylesheet">
+<link href="../css/theme.css" rel="stylesheet">
+<link href="../css/theme.tile_grid.css" rel="stylesheet">
+<link href="../css/theme.footer.css" rel="stylesheet">
+<!-- dark color palette -->
+<link href="../css/palettes/dark.css" rel="stylesheet">
+
+<!-- page layout -->
+<style>
+/* initially set page layout to a one column grid */
+.terminal-mkdocs-main-grid {
+    display: grid;
+    grid-column-gap: 1.4em;
+    grid-template-columns: auto;
+    grid-template-rows: auto;
+}
+
+/*  
+*   when side navigation is not hidden, use a two column grid.  
+*   if the screen is too narrow, fall back to the initial one column grid layout.
+*   in this case the main content will be placed under the navigation panel. 
+*/
+@media only screen and (min-width: 70em) {
+    .terminal-mkdocs-main-grid {
+        grid-template-columns: 4fr 9fr;
+    }
+}</style>
+
+
+
+    
+    <link href="../assets/custom.css" rel="stylesheet">  
+    
+    
+
+    
+    <!-- search css support -->
+<link href="../css/search/bootstrap-modal.css" rel="stylesheet">
+<!-- search scripts -->
+<script>
+    var base_url = "..",
+    shortcuts = "{}";
+</script>
+<script src="../js/jquery/jquery-1.10.1.min.js" defer></script>
+<script src="../js/bootstrap/bootstrap.min.js" defer></script>
+<script src="../js/mkdocs/base.js" defer></script>
+    
+    
+    
+    
+    <script src="../assets/custom.js"></script>
+    
+    <script src="../search/main.js"></script>
+    
+
+    
+</head>
+
+<body class="terminal"><div class="container">
+    <div class="terminal-nav">
+        <header class="terminal-logo">
+            <div id="mkdocs-terminal-site-name" class="logo terminal-prompt"><a href="/" class="no-style">pyvocals Documentation</a></div>
+        </header>
+        
+        <nav class="terminal-menu">
+            
+            <ul vocab="https://schema.org/" typeof="BreadcrumbList">
+                
+                
+                <li property="itemListElement" typeof="ListItem">
+                    <a href=".." class="menu-item " property="item" typeof="WebPage">
+                        <span property="name">Home</span>
+                    </a>
+                    <meta property="position" content="0">
+                </li>
+                
+                
+                <li property="itemListElement" typeof="ListItem">
+                    <a href="../license/" class="menu-item " property="item" typeof="WebPage">
+                        <span property="name">License</span>
+                    </a>
+                    <meta property="position" content="1">
+                </li>
+                
+                
+                <li property="itemListElement" typeof="ListItem">
+                    <a href="./" class="menu-item active" property="item" typeof="WebPage">
+                        <span property="name">API Reference</span>
+                    </a>
+                    <meta property="position" content="2">
+                </li>
+                
+                    
+                    
+
+
+<li property="itemListElement" typeof="ListItem">
+    <a href="#" class="menu-item" data-toggle="modal" data-target="#mkdocs_search_modal" property="item" typeof="SearchAction">
+        <i aria-hidden="true" class="fa fa-search"></i> <span property="name">Search</span>
+    </a>
+    <meta property="position" content="3">
+</li>
+                    
+            </ul>
+            
+        </nav>
+    </div>
+</div>
+        
+    <div class="container">
+        <div class="terminal-mkdocs-main-grid"><aside id="terminal-mkdocs-side-panel"><nav>
+  
+    <ul class="terminal-mkdocs-side-nav-items">
+        
+          
+
+
+
+<li class="terminal-mkdocs-side-nav-li">
+    
+    
+    
+        
+        
+            <a class="
+
+    terminal-mkdocs-side-nav-item" href="..">Home</a>
+        
+    
+    
+    
+  </li>
+        
+          
+
+
+
+<li class="terminal-mkdocs-side-nav-li">
+    
+    
+    
+        
+        
+            <a class="
+
+    terminal-mkdocs-side-nav-item" href="../license/">License</a>
+        
+    
+    
+    
+  </li>
+        
+          
+
+
+
+<li class="terminal-mkdocs-side-nav-li">
+    
+    
+    
+        
+        <span class="
+
+    terminal-mkdocs-side-nav-item--active">API Reference</span>
+    
+    
+    
+  </li>
+        
+    </ul>
+  
+</nav><hr>
+<nav>
+    <ul>
+        <li><a href="#extract_features">extract_features</a></li>
+        <li><a href="#preprocess_audio">preprocess_audio()</a></li>
+        <li><a href="#get_vocal_states">get_vocal_states()</a></li>
+        <li><a href="#find_vocal_turns">find_vocal_turns()</a></li>
+        <li><a href="#find_pauses">find_pauses()</a></li>
+        <li><a href="#find_switching_pauses">find_switching_pauses()</a></li>
+        <li><a href="#find_simultaneous_speech">find_simultaneous_speech()</a></li>
+        <li><a href="#plot_vocals">plot_vocals()</a></li>
+        
+    </ul>
+</nav>
+</aside>
+            <main id="terminal-mkdocs-main-content">
+<section id="mkdocs-terminal-content">
+    <p><span style="font-size: 18pt; font-weight: bold">API Reference</span>  </p>
+<p>This section provides detailed documentation for the functions available in 
+this project. To get started, import the functions using 
+<code>import pyvocals</code>.</p>
+<p><br></p>
+<h1 id="extract_features">extract_features<a class="headerlink" href="#extract_features" title="Permanent link">&para;</a></h1>
+<div class="source-link">[<a href="https://github.
+com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L308" 
+target="_blank">source</a>]</div>
+
+<p><span class="function-text">extract_features(p1, p2, p1_label = 'Child', 
+p2_label = 'Parent', start_time = None, fs = None)</span></p>
+<p>Extract switching and interruptive turn events for each social partner.</p>
+<h3 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h3>
+<p><strong>p1</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc">An array containing occurrences (<code>1</code>) and 
+non-occurrences (<code>0</code>) of the first partner's vocalizations.
+</div>
+<p><strong>p2</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc">An 
+array containing occurrences (<code>1</code>) and non-occurrences 
+(<code>0</code>) of the second partner's vocalizations.</div>
+<p><strong>p1_label</strong> (<em>str, optional</em>)</p>
+<div id="api-param-desc">The name of the first partner; by default, 
+<code>'Child'</code>.</div>
+<p><strong>p2_label</strong> (str, optional_)</p>
+<div id="api-param-desc">The name of the second partner; by default, 
+<code>'Parent'</code>.</div>
+<p><strong>start_time</strong> (<em>datetime.datetime, optional</em>)</p>
+<div id="api-param-desc">A <code>datetime</code> value denoting the 
+start time of the vocalization data.</div>
+<p><strong>fs</strong> (<em>int, optional</em>)</p>
+<div id="api-param-desc" class="last">The sampling rate of the vocalization 
+instances. This value must be provided if <code>start_time</code> is not 
+<code>None</code>.</div>
+
+<h3 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h3>
+<p><strong>dyad_vocals</strong> (<em>pandas.DataFrame</em>)</p>
+<div id="api-param-desc" class="last">A DataFrame containing each 
+partner's time series of extracted vocal states and turn-taking features.</div>
+
+<h3 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h3>
+<pre>
+> p1 = [0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0]
+> p2 = [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1]
+> start_time = datetime.datetime(2025, 2, 23, 13, 23, 0)
+> vocal_turns = pyvocals.extract_features(p1, p2, start_time = start_time, 
+                                          fs = 1)
+> vocal_turns.head()
+
+<font color="#8c9f87"><b>Output:</b></font>
+            Timestamp  Child  Parent  Child_ST  Child_IT  Parent_ST  Parent_IT
+0 2025-02-23 12:31:43      0       1       NaN       NaN        NaN        NaN
+1 2025-02-23 12:31:44      0       1       NaN       NaN        NaN        NaN
+2 2025-02-23 12:31:45      0       1       NaN       NaN        NaN        NaN
+3 2025-02-23 12:31:46      5       1       NaN       1.0        NaN        NaN
+4 2025-02-23 12:31:47      1       0       NaN       1.0        NaN        NaN
+</pre>
+
+<hr>
+
+<h1 id="preprocess_audio">preprocess_audio()<a class="headerlink" href="#preprocess_audio" title="Permanent link">&para;</a></h1>
+<div class="source-link">[<a href="https://github.
+com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L9" target="_blank">source</a>]</div>
+
+<p><span class="function-text">preprocess_audio(file, start_time = None, 
+target_fs = 4)</span></p>
+<p>Pre-process vocalization data from a social partner's audio file into 
+vocalization instances.</p>
+<h3 id="parameters_1">Parameters<a class="headerlink" href="#parameters_1" title="Permanent link">&para;</a></h3>
+<p><strong>file</strong> (<em>str</em>)</p>
+<div id="api-param-desc">The filepath of the audio file (.wav, .mp3).</div>
+<p><strong>start_time</strong> (<em>datetime.datetime, optional</em>)</p>
+<div id="api-param-desc">A <code>datetime</code> value denoting the start 
+time of the audio file. If <code>None</code>, audio data will be resampled 
+using the mean of values within the target sampling interval.</div>
+<p><strong>target_fs</strong> (<em>int, optional</em>)</p>
+<div id="api-param-desc" class="last">The target sampling rate to which the 
+resample the original signal; by default, 4 Hz.</div>
+
+<h3 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h3>
+<p><strong>signal</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc" class="last">An array containing the 
+pre-processed vocalization signal.</div>
+
+<hr>
+
+<h1 id="get_vocal_states">get_vocal_states()<a class="headerlink" href="#get_vocal_states" title="Permanent link">&para;</a></h1>
+<div class="source-link">[<a href="https://github.
+com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L56" 
+target="_blank">source</a>]</div>
+
+<p><span class="function-text">get_vocal_states(p1, p2, p1_label = 'Child', 
+p2_label = 'Parent', start_time = None, fs = None)</span></p>
+<p>Process vocalization instances of a dyad into vocal states. Numeric values 
+of vocal states are as follows:</p>
+<ul>
+<li>1 = Vocalization</li>
+<li>2 = Pause</li>
+<li>3 = Switching pause</li>
+<li>4 = Non-interruptive simultaneous speech</li>
+<li>5 = Interruptive simultaneous speech</li>
+</ul>
+<h3 id="parameters_2">Parameters<a class="headerlink" href="#parameters_2" title="Permanent link">&para;</a></h3>
+<p><strong>p1</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc">An array containing occurrences (<code>1</code>) and 
+non-occurrences (<code>0</code>) of the first partner's vocalizations.</div>
+<p><strong>p2</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc">An array containing occurrences (<code>1</code>) and 
+non-occurrences (<code>0</code>) of the second partner's vocalizations.</div>
+<p><strong>p1_label</strong> (<em>str, optional</em>)</p>
+<div id="api-param-desc">The name of the first partner; by default, 
+<code>'Child'</code>.
+</div>
+<p><strong>p2_label</strong> (<em>str, optional</em>)</p>
+<div id="api-param-desc">The name of the second partner; by default, 
+<code>'Parent'</code>.</div>
+<p><strong>start_time</strong> (<em>datetime.datetime, optional</em>)</p>
+<div id="api-param-desc">A <code>datetime</code> value denoting the start 
+time of the vocalization data.</div>
+<p><strong>fs</strong> (<em>int, optional</em>)</p>
+<div id="api-param-desc" class="last">The sampling rate of the vocalization 
+instances. This value must be provided if <code>start_time</code> is not 
+<code>None</code>.</div>
+
+<h3 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h3>
+<p><font color="#8c9f87"><strong>tuple:</strong></font> If <code>start_time = None</code>, 
+returns:</p>
+<p><strong>p1_vocal_states</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc">An array containing the first partner's processed 
+vocal states.</div>
+<p><strong>p2_vocal_states</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc" class="last">An array containing the second 
+partner's processed vocal states.</div>
+
+<p><font color="#8c9f87"><strong>pandas.DataFrame:</strong></font> If 
+<code>start_time</code> is not <code>None</code>, returns a DataFrame with 
+the following columns:</p>
+<ul>
+<li>'Timestamp': Timestamped intervals.</li>
+<li>'P1': The first partner's processed vocal states.</li>
+<li>'P2': The second partner's processed vocal states.</li>
+</ul>
+<h3 id="example_1">Example<a class="headerlink" href="#example_1" title="Permanent link">&para;</a></h3>
+<pre style="margin-bottom: 2em;">
+> p1 = [0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0]
+> p2 = [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1]
+> start_time = datetime.datetime(2025, 2, 23, 13, 23, 0)
+> vocal_states = pyvocals.get_vocal_states(p1, p2, start_time = start_time, 
+                                           fs = 1)
+> vocal_states.head()
+
+<font color="#8c9f87"><b>Output:</b></font>
+            Timestamp  Child  Parent
+0 2025-02-23 12:31:43      0       1
+1 2025-02-23 12:31:44      0       1
+2 2025-02-23 12:31:45      0       1
+3 2025-02-23 12:31:46      5       1
+4 2025-02-23 12:31:47      1       0
+</pre>
+
+<h3 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h3>
+<p>Jaffe, J., &amp; Feldstein, S. (1970). Rhythms of dialogue. Academic Press.</p>
+<hr>
+
+<h1 id="find_vocal_turns">find_vocal_turns()<a class="headerlink" href="#find_vocal_turns" title="Permanent link">&para;</a></h1>
+<div class="source-link">[<a href="https://github.
+com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L174" 
+target="_blank">source</a>]</div>
+
+<p><span class="function-text">find_vocal_turns(p1, p2, fs = 4, 
+max_pause_duration = 5)</span></p>
+<p>Identify indices of when each person's vocal and simultaneous speech turns 
+begin and end.</p>
+<h3 id="parameters_3">Parameters<a class="headerlink" href="#parameters_3" title="Permanent link">&para;</a></h3>
+<p><strong>p1</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc">An array containing the first partner's vocal 
+states.</div>
+<p><strong>p2</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc">An array containing the second partner's vocal 
+states.</div>
+<p><strong>fs</strong> (<em>int, float</em>)</p>
+<div id="api-param-desc">The sampling rate of the vocalization instances; 
+by default, 4 Hz.</div>
+<p><strong>max_pause_duration</strong> (<em>int, float</em>, optional)</p>
+<div id="api-param-desc" class="last">The maximum allowable duration of a 
+pause (in seconds) during which a vocal turn is still considered valid; by 
+default, 5.</div>
+
+<h3 id="returns_3">Returns<a class="headerlink" href="#returns_3" title="Permanent link">&para;</a></h3>
+<p><font color="#8c9f87"><strong>tuple:</strong></font> </p>
+<p><strong>p1_voc_turns</strong> (<em>list</em>)</p>
+<div id="api-param-desc">A list of tuples containing indices denoting the 
+start and end of the first partner's vocal turns.</div>
+<p><strong>p1_ss_turns</strong> (<em>list</em>)</p>
+<div id="api-param-desc">A list of tuples containing indices denoting the 
+start and end of the first partner's simultaneous speech turns.</div>
+<p><strong>p2_voc_turns</strong> (<em>list</em>)</p>
+<div id="api-param-desc">A list of tuples containing indices denoting the 
+start and end of the second partner's vocal turns.</div>
+<p><strong>p2_ss_turns</strong> (<em>list</em>)</p>
+<div id="api-param-desc" class="last">A list of tuples containing indices 
+denoting the start and end of the second partner's simultaneous speech 
+turns.</div>
+
+<hr>
+
+<h1 id="find_pauses">find_pauses()<a class="headerlink" href="#find_pauses" title="Permanent link">&para;</a></h1>
+<div class="source-link">[<a href="https://github.
+com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L494" 
+target="_blank">source</a>]</div>
+
+<p><span class="function-text">find_pauses(p1, p2)</span></p>
+<p>Identify indices of two social partners' pause occurrences.</p>
+<h3 id="parameters_4">Parameters<a class="headerlink" href="#parameters_4" title="Permanent link">&para;</a></h3>
+<p><strong>p1</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc">An array containing occurrences (<code>1</code>) and 
+non-occurrences (<code>0</code>) of the first partner's vocalizations.</div>
+<p><strong>p2</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc" class="last">An array containing occurrences 
+(<code>1</code>) and non-occurrences (<code>0</code>) of the second 
+partner's vocalizations.</div>
+
+<h3 id="returns_4">Returns<a class="headerlink" href="#returns_4" title="Permanent link">&para;</a></h3>
+<p><strong>pauses1</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc">An array containing indices of the first partner's 
+pauses.</div>
+<p><strong>pauses2</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc" class="last">An array containing indices of the 
+second partner's pauses.</div>
+
+<hr>
+
+<h1 id="find_switching_pauses">find_switching_pauses()<a class="headerlink" href="#find_switching_pauses" title="Permanent link">&para;</a></h1>
+<div class="source-link">[<a href="https://github.
+com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L561" 
+target="_blank">source</a>]</div>
+
+<p><span class="function-text">find_switching_pauses(p1, p2)</span></p>
+<p>Identify indices of two social partners' switching pause occurrences. A 
+switching pause is defined as a pause bounded by the end of one partner's 
+vocalization and the start of the other partner's vocalization.</p>
+<h3 id="parameters_5">Parameters<a class="headerlink" href="#parameters_5" title="Permanent link">&para;</a></h3>
+<p><strong>p1</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc">An array containing occurrences (<code>1</code>) and 
+non-occurrences (<code>0</code>) of the first partner's vocalizations.</div>
+<p><strong>p2</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc" class="last">An array containing occurrences 
+(<code>1</code>) and non-occurrences (<code>0</code>) of the second 
+partner's vocalizations.</div>
+
+<h3 id="returns_5">Returns<a class="headerlink" href="#returns_5" title="Permanent link">&para;</a></h3>
+<p><font color="#8c9f87"><strong>tuple:</strong></font> </p>
+<p><strong>p1_switching_pauses</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc">An array containing indices of the first partner's 
+switching pauses.</div>
+<p><strong>p2_switching_pauses</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc" class="last">An array containing indices of the 
+second partner's switching pauses.</div>
+
+<hr>
+
+<h1 id="find_simultaneous_speech">find_simultaneous_speech()<a class="headerlink" href="#find_simultaneous_speech" title="Permanent link">&para;</a></h1>
+<div class="source-link">[<a href="https://github.
+com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L650" 
+target="_blank">source</a>]</div>
+
+<p><span class="function-text">find_simultaneous_speech(p1, p2)</span></p>
+<p>Identify indices of two social partners' interruptive (ISS) and 
+non-interruptive simultaneous speech (NSS) occurrences.</p>
+<h3 id="parameters_6">Parameters<a class="headerlink" href="#parameters_6" title="Permanent link">&para;</a></h3>
+<p><strong>p1</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc">An array containing occurrences (<code>1</code>) and 
+non-occurrences (<code>0</code>) of the first partner's vocalizations.</div>
+<p><strong>p2</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc" class="last">An array containing occurrences 
+(<code>1</code>) and non-occurrences (<code>0</code>) of the second 
+partner's vocalizations.</div>
+
+<h3 id="returns_6">Returns<a class="headerlink" href="#returns_6" title="Permanent link">&para;</a></h3>
+<p><font color="#8c9f87"><strong>tuple:</strong></font> </p>
+<p><strong>p1_iss</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc">An array containing indices of the first partner's 
+ISS occurrences.</div>
+<p><strong>p1_nss</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc">An array containing indices of the first partner's 
+NSS occurrences.</div>
+<p><strong>p2_iss</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc">An array containing indices of the 
+second partner's ISS occurrences.</div>
+<p><strong>p2_nss</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc" class="last">An array containing indices of the 
+second partner's NSS occurrences.</div>
+
+<hr>
+
+<h1 id="plot_vocals">plot_vocals()<a class="headerlink" href="#plot_vocals" title="Permanent link">&para;</a></h1>
+<div class="source-link">[<a href="https://github.
+com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L388" 
+target="_blank">source</a>]</div>
+
+<p><span class="function-text">plot_vocals(p1, p2, fs, seg_num = 1, seg_size = 
+15, p1_label = 'Child', p2_label = 'Parent')</span></p>
+<p>Visualize two social partners' vocalization time series.</p>
+<h3 id="parameters_7">Parameters<a class="headerlink" href="#parameters_7" title="Permanent link">&para;</a></h3>
+<p><strong>p1</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc">An array containing the first partner's 
+vocalizations.</div>
+<p><strong>p2</strong> (<em>array-like</em>)</p>
+<div id="api-param-desc">An array containing the second partner's 
+vocalizations.</div>
+<p><strong>fs</strong> (<em>int</em>)</p>
+<div id="api-param-desc">The sampling rate of the input data.</div>
+<p><strong>seg_num</strong> (<em>int, optional</em>)</p>
+<div id="api-param-desc">The segment number to visualize.</div>
+<p><strong>seg_size</strong> (<em>int, optional</em>)</p>
+<div id="api-param-desc">The length of the segment (in seconds) to be 
+visualized; by default, 15 seconds.</div>
+<p><strong>p1_label</strong> (<em>str, optional</em>)</p>
+<div id="api-param-desc">The name of the first partner; by default, 'Child'.
+</div>
+<p><strong>p2_label</strong> (<em>str, optional</em>)</p>
+<div id="api-param-desc" class="last">The name of the second partner; by 
+default, 'Parent'.</div>
+
+<h3 id="returns_7">Returns<a class="headerlink" href="#returns_7" title="Permanent link">&para;</a></h3>
+<p><strong>fig</strong> (<em>matplotlib.figure</em>)</p>
+<div id="api-param-desc" class="last">A figure containing two subplots, one 
+for each social partner's vocal states.</div>
+</section>
+
+            </main>
+        </div>
+        <hr><footer>
+    <div class="terminal-mkdocs-footer-grid">
+        <div id="terminal-mkdocs-footer-copyright-info">
+             Site built with <a href="http://www.mkdocs.org">MkDocs</a> and <a href="https://github.com/ntno/mkdocs-terminal">Terminal for MkDocs</a>.
+        </div>
+    </div>
+</footer>
+    </div>
+
+    
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="alertdialog" aria-modal="true" aria-labelledby="searchModalLabel">
+    <div class="modal-dialog modal-lg" role="search">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="searchModalLabel">Search</h5>
+                <button type="button" class="close btn btn-default btn-ghost" data-dismiss="modal"><span aria-hidden="true">x</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p id="searchInputLabel">Type to start searching</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" aria-labelledby="searchInputLabel" placeholder="" id="mkdocs-search-query" title="Please enter search terms here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No document matches found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+    
+    
+</body>
+
+</html>
