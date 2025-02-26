@@ -1,4 +1,6 @@
 # pyvocals 0.1
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14933999.svg)](https://doi.org/10.5281/zenodo.14933999)
+
 **pyvocals** is a Python tool for analyzing vocal turn-taking in 
 conversational speech. It extracts structured features from audio files 
 based on the behavioral coding schema in [[1]](#reference-1), including 
