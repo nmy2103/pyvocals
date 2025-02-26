@@ -1,0 +1,20 @@
+site_name: pyvocals Documentation
+theme:
+  name: terminal
+  palette: dark
+  features:
+    - navigation.side.indexes
+nav:
+  - Home: index.md
+  - License: license.md
+  - API Reference: api-reference.md
+
+markdown_extensions:
+  - toc:
+      permalink: true
+      toc_depth: 2
+extra_css:
+  - assets/custom.css
+extra_javascript:
+  - assets/custom.js
+repo_url: https://github.com/nmy2103/pyvocals
