@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Sequence, Tuple, Union
+from typing import Optional, Sequence, Tuple, Union
 from matplotlib.patches import Rectangle
 from datetime import datetime
 import matplotlib.pyplot as plt
@@ -79,13 +79,13 @@ def get_vocal_states(
         The name of the first partner; by default, 'Child'.
     p2_label : str, optional
         The name of the second partner; by default, 'Parent'.
-    start_time : datetime.datetime
+    start_time : datetime.datetime, optional
         A `datetime` value denoting the start time of the vocalization data.
         If `None`, a tuple of two arrays containing the two partners' vocal 
         states will be returned; otherwise, a DataFrame with columns 
         containing timestamps and each partner's vocal states will be 
         returned.
-    fs : int
+    fs : int, optional
         The sampling rate of the vocalization instances. This value must be 
         provided if `start_time` is not `None`.
 
@@ -94,9 +94,9 @@ def get_vocal_states(
     tuple
         If `start_time` is `None`, returns a tuple:
         
-        p1_vocal_states : array_like
+        p1_vocal_states : array-like
             An array containing the first partner's processed vocal states.
-        p2_vocal_states : array_like
+        p2_vocal_states : array-like
             An array containing the second partner's processed vocal states.
 
     pandas.DataFrame
@@ -163,7 +163,7 @@ def get_vocal_states(
         return p1_vocal_states, p2_vocal_states
     else:
         timestamps = pd.date_range(start = start_time,
-                                   freq = f'{1/fs}S',
+                                   freq = f'{1/fs}s',
                                    periods = len(p1_vocal_states))
         dyad = pd.DataFrame({
             'Timestamp': timestamps,
@@ -171,16 +171,21 @@ def get_vocal_states(
             p2_label: p2_vocal_states})
         return dyad
 
-def find_vocal_turns(p1, p2, fs = 4, max_pause_duration = 5):
+def find_vocal_turns(
+    p1: Union[np.ndarray, Sequence[int]],
+    p2: Union[np.ndarray, Sequence[int]],
+    fs: int = 4,
+    max_pause_duration: int = 5
+) -> Tuple[list, list, list, list]:
     """
     Identify indices of when each person's vocal and simultaneous speech 
     turns begin and end.
     
     Parameters
     ----------
-    p1 : array_like
+    p1 : array-like
         An array containing the first partner's vocal states.
-    p2 : array_like
+    p2 : array-like
         An array containing the second partner's vocal states.
     fs : int, float
         The sampling rate of the vocalization instances; by default, 4.
@@ -307,7 +312,7 @@ def extract_features(
     p2_label: str = 'Parent', 
     start_time: Optional[datetime] = None,
     fs: Optional[int] = None
-) -> Dict[str, Union[np.ndarray, pd.DataFrame, list]]:
+) -> pd.DataFrame:
     """
     Extract Switching and Interruptive Turns for each social partner.
     
@@ -362,6 +367,10 @@ def extract_features(
             p1_label: p1_vocal_states,
             p2_label: p2_vocal_states,
         })
+    dyad_vocals[f'{p1_label}_ST'] = np.nan
+    dyad_vocals[f'{p1_label}_IT'] = np.nan
+    dyad_vocals[f'{p2_label}_ST'] = np.nan
+    dyad_vocals[f'{p2_label}_IT'] = np.nan
     for turn in [vocal_turns[0], vocal_turns[1], 
                  vocal_turns[2], vocal_turns[3]]:
         for (start, end) in turn:
@@ -390,9 +399,9 @@ def plot_vocals(
     
     Parameters
     ----------
-    p1 : array_like
+    p1 : array-like
         An array containing the first partner's vocalizations.
-    p2 : array_like
+    p2 : array-like
         An array containing the second partner's vocalizations.
     fs : int
         The sampling rate of the input data.
@@ -491,10 +500,10 @@ def find_pauses(
     
     Parameters
     ----------
-    p1 : array_like
+    p1 : array-like
         An array containing occurrences (`1`) and non-occurrences (`0`) of 
         the first partner's vocalizations.
-    p2 : array_like
+    p2 : array-like
         An array containing occurrences (`1`) and non-occurrences (`0`) of 
         the second partner's vocalizations.
         
@@ -509,7 +518,7 @@ def find_pauses(
     -------
     >>> p1 = np.array([0, 0, 0, 1, 1, 1, 0, 0, 1, 1])
     >>> p2 = np.array([1, 1, 0, 0, 0, 0, 0, 1, 1, 1])
-    >>> pauses1, pauses2 = get_pauses(p1, p2)
+    >>> pauses1, pauses2 = find_pauses(p1, p2)
     """
     
     if len(p1) != len(p2):
@@ -523,7 +532,7 @@ def find_pauses(
             if p2[n] != p2[n - 1]:
                 p2_switches.append(n)
         
-        swp1, swp2 = get_switching_pauses(p1, p2)
+        swp1, swp2 = find_switching_pauses(p1, p2)
         swp = [swp1, swp2]
         pauses = {}
         for i, switches in enumerate([p1_switches, p2_switches]):
@@ -537,7 +546,10 @@ def find_pauses(
                     pause_start = sw1
                     pause_end = sw2 - 1
                     pauses[i].append(np.arange(pause_start, pause_end + 1))
-            pauses[i] = np.hstack(pauses[i])
+            if pauses[i]:
+                pauses[i] = np.hstack(pauses[i])
+            else:
+                pauses[i] = np.array([])
             remove = ~np.isin(pauses[i], swp[i])
             pauses[i] = pauses[i][remove]
             
@@ -645,10 +657,10 @@ def find_simultaneous_speech(
     
     Parameters
     ----------
-    p1 : array_like
+    p1 : array-like
         An array containing occurrences (`1`) and non-occurrences (`0`) of 
         the first partner's vocalizations.
-    p2 : array_like
+    p2 : array-like
         An array containing occurrences (`1`) and non-occurrences (`0`) of 
         the second partner's vocalizations.
         

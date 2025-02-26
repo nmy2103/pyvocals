@@ -12,7 +12,7 @@
 __version__ = '0.1'
 
 # Import the entire `pyvocals` module
-from . import pyvocals
+from .pyvocals import *
 
 # Allow wildcard imports
 __all__ = ['pyvocals']
