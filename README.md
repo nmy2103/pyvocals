@@ -35,6 +35,20 @@ cd pyvocals
 pip install -e .
 ```
 
+## Citation
+If you use this package in your research, please cite it with the following:
+```
+@software{pyvocals2025,
+  author       = {Yamane, N.},
+  title        = {pyvocals: A Python package for vocal turn-taking feature extraction},
+  year         = {2025},
+  version      = {0.1.0},
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.14933999},
+  url          = {https://doi.org/10.5281/zenodo.14933999}
+}
+```
+
 ## References
 <a id="reference-1"></a>
 [1] Jaffe, J., & Feldstein, S. (1970). _Rhythms of dialogue_. Academic Press.
