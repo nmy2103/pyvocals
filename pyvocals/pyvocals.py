@@ -232,7 +232,7 @@ def find_vocal_turns(
                     for p in range(m, min(pause_end, total_duration)):
                         if p1[p] == 1 or p2[p] == 1:
                             p1_ss_end_ix = p
-                            p1_ss_turns.append((p1_ss_start_ix, p1_ss_end_ix))
+                            p1_ss_turns.append((p1_ss_start_ix, p1_ss_end_ix - 1))
                             is_ss = True
                             n = p1_ss_end_ix
                             break
@@ -252,7 +252,7 @@ def find_vocal_turns(
                     for p in range(m, min(pause_end, total_duration)):
                         if p2[p] == 1 and p1[p] == 2:
                             p2_start_ix = p
-                            p1_voc_turns.append((p1_start_ix, p2_start_ix))
+                            p1_voc_turns.append((p1_start_ix, p2_start_ix - 1))
                             n = p2_start_ix
                             is_turn = True
                             break
@@ -271,7 +271,7 @@ def find_vocal_turns(
                     for p in range(m, min(pause_end, total_duration)):
                         if p2[p] == 1 or p1[p] == 1:
                             p2_ss_end_ix = p
-                            p2_ss_turns.append((p2_ss_start_ix, p2_ss_end_ix))
+                            p2_ss_turns.append((p2_ss_start_ix, p2_ss_end_ix - 1))
                             is_ss = True
                             n = p2_ss_end_ix
                             break
@@ -292,7 +292,7 @@ def find_vocal_turns(
                         for p in range(m, min(pause_end, total_duration)):
                             if p1[p] == 1 and p2[p] == 2:
                                 p1_start_ix = p
-                                p2_voc_turns.append((p2_start_ix, p1_start_ix))
+                                p2_voc_turns.append((p2_start_ix, p1_start_ix - 1))
                                 n = p1_start_ix
                                 is_turn = True
                                 break
@@ -340,15 +340,9 @@ def extract_features(
         A DataFrame containing each partner's time series of extracted vocal 
         states and turn-taking features.
     """
-    
-    def mark_turns(row):
-        """Mark turns across all rows."""
-        for key, turns in row.items():
-            for start, end in turns:
-                dyad_vocals.loc[start:end, key] = 1
                 
     # Get vocal states
-    vocal_states = get_vocal_states(p1, p2, start_time=start_time, fs = fs)
+    vocal_states = get_vocal_states(p1, p2, start_time = start_time, fs = fs)
 
     if isinstance(vocal_states, tuple):
         p1_vocal_states, p2_vocal_states = vocal_states
@@ -425,9 +419,6 @@ def plot_vocals(
     seg_start = int((seg_num - 1) * fs * seg_size)
     seg_end = seg_start + int(fs * seg_size)
 
-    seg_start = int((seg_num - 1) * fs * seg_size)
-    seg_end = seg_start + int(fs * seg_size)
-
     p1_voc_on = np.where(np.diff(p1[seg_start:seg_end]) > 0)[0] + 1
     p1_voc_off = np.where(np.diff(p1[seg_start:seg_end]) < 0)[0] + 1
     p2_voc_on = np.where(np.diff(p2[seg_start:seg_end]) > 0)[0] + 1
@@ -435,7 +426,7 @@ def plot_vocals(
 
     tick_positions = np.arange(0, int(seg_size * fs) + 5, 5)
 
-    plt.rcParams['font.family'] = 'Arial'
+    plt.rcParams['font.family'] = ['Instrument Sans', 'Arial', 'sans-serif']
     fig, ax = plt.subplots(2, 1, figsize = (10, 3), dpi = 96)
     
     # P1 subplot
@@ -457,7 +448,7 @@ def plot_vocals(
     for sp in ['top', 'right', 'left']:
         ax[0].spines[sp].set_visible(False)
     ax[0].set_ylabel(
-        p1_label, fontweight = 'bold', fontsize = 13, rotation = 0)
+        p1_label, fontsize = 13, rotation = 0)
     ax[0].yaxis.set_label_coords(-.04, 0.4)
     
     # P2 subplot
@@ -482,7 +473,7 @@ def plot_vocals(
     for sp in ['top', 'right', 'left']:
         ax[1].spines[sp].set_visible(False)
     ax[1].set_ylabel(
-        p2_label, fontweight = 'bold', fontsize = 13, rotation = 0)
+        p2_label, fontsize = 13, rotation = 0)
     ax[1].yaxis.set_label_coords(-.045, 0.4)
     ax[1].set_xlabel('Time [sec]', fontsize = 12, labelpad = 10)
     ax[1].tick_params(
