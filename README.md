@@ -1,4 +1,4 @@
-# pyvocals 0.1
+# pyvocals 0.1.1
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14933999.svg)](https://doi.org/10.5281/zenodo.14933999)
 
 **pyvocals** is a Python tool for analyzing vocal turn-taking in 

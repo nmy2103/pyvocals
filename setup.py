@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'pyvocals',
-    version = '0.1',
+    version = '0.1.1',
     author = 'Natasha Yamane',
     author_email = 'natasha.yamane@gmail.com',
     packages = find_packages(),
