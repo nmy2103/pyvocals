@@ -1,6 +1,7 @@
 from typing import Optional, Sequence, Tuple, Union
 from matplotlib.patches import Rectangle
 from datetime import datetime
+from tqdm import tqdm
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -178,8 +179,8 @@ def find_vocal_turns(
     max_pause_duration: int = 5
 ) -> Tuple[list, list, list, list]:
     """
-    Identify indices of when each person's vocal and simultaneous speech 
-    turns begin and end.
+    Identify indices of when each person's switching and interruptive turns 
+    begin and end.
     
     Parameters
     ----------
@@ -195,115 +196,172 @@ def find_vocal_turns(
         
     Returns
     -------
-    p1_voc_turns : list
+    p1_switching_turns : list
         A list of tuples containing indices denoting the start and end of 
-        the first partner's vocal turns.
-    p1_ss_turns : list
+        the first partner's switching turns.
+    p1_interrupt_turns : list
         A list of tuples containing indices denoting the start and end of
-        the first partner's simultaneous speech turns.
-    p2_voc_turns : list
+        the first partner's interruptive turns.
+    p2_switching_turns : list
         A list of tuples containing indices denoting the start and end of
-        the second partner's vocal turns.
-    p2_ss_turns : list
+        the second partner's switching turns.
+    p2_interrupt_turns : list
         A list of tuples containing indices denoting the start and end of
-        the second partner's simultaneous speech turns.
+        the second partner's interruptive turns.
     """
     if len(p1) != len(p2):
         raise Exception('The lengths of `p1` and `p2` must be equal.')
+
+    # Set max pause duration (samples)
+    max_pause = int(fs * max_pause_duration)
     
-    p1_voc_turns = []
-    p2_voc_turns = []
-    p1_ss_turns = []
-    p2_ss_turns = []
-    total_duration = len(p1)
-    max_pause = int(max_pause_duration * fs)
+    # Create storage arrays
+    p1_switching_turns = []
+    p1_interrupt_turns = []
+    p2_switching_turns = []
+    p2_interrupt_turns = []
     
     n = 0
+    total_duration = len(p1)
+    is_st = False 
+    is_it = False
     while n < total_duration:
-        is_turn = False
-        is_ss = False
+        if p2[n] == 1 and p1[n] in (0, 2):  # if P2 vocalizes
+            p2_voc_start = n
+            for m in range(p2_voc_start, total_duration):
         
-        # Get partner 1's simultaneous speech turns
-        if p1[n] == 5 and p2[n] == 1:
-            p1_ss_start_ix = n
-            for m in range(p1_ss_start_ix, total_duration):
-                if p1[m] == 2 or p1[m] == 3 or p2[m] == 5:
-                    pause_end = m + max_pause
-                    for p in range(m, min(pause_end, total_duration)):
-                        if p1[p] == 1 or p2[p] == 1:
-                            p1_ss_end_ix = p
-                            p1_ss_turns.append((p1_ss_start_ix, p1_ss_end_ix - 1))
-                            is_ss = True
-                            n = p1_ss_end_ix
+                # If P2 enters a pause
+                if p2[m] == 2:
+                    p2_pause_start = m
+                    for p in range(p2_pause_start, total_duration):
+                        if p1[p] == 1:  # and P1 immediately follows up
+                            p1_voc_start = p
+                            p2_switching_turns.append((p2_voc_start, p1_voc_start - 1))
+                            n = p1_voc_start
                             break
-                    if is_ss:
-                        break
-            if is_ss:
-                continue
+                        elif p2[p] == 1 and p1[p] == 2:  # and P2 resumes vocalizing
+                            n = p
+                            break
+                    break
         
-        # Get partner 1's vocal turns
-        if p1[n] == 1 and (p2[n] == 2 or p2[n] == 0):
-            p1_start_ix = n
-            for m in range(p1_start_ix, total_duration):
-                if p1[m] == 2 or p1[m] == 4:
-                        break
-                if p1[m] == 3 and (p2[m] == 2 or p2[m] == 0):
-                    pause_end = m + max_pause
-                    for p in range(m, min(pause_end, total_duration)):
-                        if p2[p] == 1 and p1[p] == 2:
-                            p2_start_ix = p
-                            p1_voc_turns.append((p1_start_ix, p2_start_ix - 1))
-                            n = p2_start_ix
-                            is_turn = True
-                            break
-                    if is_turn:
-                        break
-            if is_turn:
-                is_ss = False
-                continue
+                # Switching turn: P2 enters a switching pause
+                elif p2[m] == 3 and p1[m] in (0, 2):  
+                    p2_sp_start = m
         
-        # Get partner 2's simultaneous speech turns
-        if p2[n] == 5 and p1[n] == 1:
-            p2_ss_start_ix = n
-            for m in range(p2_ss_start_ix, total_duration):
-                if p2[m] == 2 or p2[m] == 3 or p1[m] == 5:
-                    pause_end = m + max_pause
-                    for p in range(m, min(pause_end, total_duration)):
-                        if p2[p] == 1 or p1[p] == 1:
-                            p2_ss_end_ix = p
-                            p2_ss_turns.append((p2_ss_start_ix, p2_ss_end_ix - 1))
-                            is_ss = True
-                            n = p2_ss_end_ix
-                            break
-                    if is_ss:
-                        break
-            if is_ss:
-                continue
+                    # Check if the switching pause duration exceeds the allowable duration
+                    pause_dur = 0
+                    while m + pause_dur < total_duration and p2[m + pause_dur] == 3:
+                        pause_dur += 1
+                    if pause_dur > max_pause:
+                        n = m + pause_dur   # skip the entire switching pause sequence
+                        break  # break out of P2's vocalization sequence; don't record any ST
+            
+                    sp_end = min(p2_sp_start + max_pause, total_duration)
+                    for p in range(p2_sp_start, sp_end):
+                        if p2[p] == 2 and p1[p] == 1:  # if P1 vocalizes in response
+                            p1_voc_start = p
+                            p2_switching_turns.append((p2_voc_start, p1_voc_start - 1))
+                            is_st = True
+                            n = p1_voc_start
+                            break  # break out of P2's switching pause sequence
+                    if is_st:
+                        is_st = False  # reset switching turn flag
+                        break  # break out of P2's switching turn sequence
+                        
+                # Interruptive turn: P1 interjects
+                elif p2[m] == 1 and p1[m] == 5:
+                    p1_it_start = m
+                    # p2_switching_turns.append((p2_voc_start, p1_it_start - 1))
+                    for i in range(p1_it_start, total_duration):
+                        if ((p2[i] in (1, 5) and p1[i] == 1) or       # if P1 vocalizes
+                            (p2[i] in (0, 2) and p1[i] in (2, 3))):   # if P2 stops
+                            p1_it_stop = i
+                            p1_interrupt_turns.append((p1_it_start, p1_it_stop - 1))
+                            is_it = True
+                            n = p1_it_stop
+                            break  # break out of P1's interruptive turn sequence
+                    if is_it:
+                        is_it = False  # reset interruptive turn flag
+                        break  # break out of P2's vocalization sequence
+                    else:
+                        p2_interrupt_turns.append((p1_it_start, total_duration - 1))
+                        n = total_duration
+        
+                # If P2 enters a pause
+                elif p2[m] == 2 and p1[m] in (0, 2):
+                    n = m
+                        
+                else:
+                    n = total_duration
+                    
+        elif p1[n] == 1 and p2[n] in (0, 2):  # if P1 vocalizes
+            p1_voc_start = n
+            for m in range(p1_voc_start, total_duration):
                 
-        # Get partner 2's vocal turns    
-        if p2[n] == 1 and (p1[n] == 2 or p1[n] == 0):
-            p2_start_ix = n
-            for m in range(p2_start_ix, total_duration):
-                if p2[m] != 1:
-                    if p2[m] == 2 or p2[m] == 4:
-                        break
-                    if p2[m] == 3 and (p1[m] == 2 or p1[m] == 0):
-                        pause_end = m + max_pause
-                        for p in range(m, min(pause_end, total_duration)):
-                            if p1[p] == 1 and p2[p] == 2:
-                                p1_start_ix = p
-                                p2_voc_turns.append((p2_start_ix, p1_start_ix - 1))
-                                n = p1_start_ix
-                                is_turn = True
-                                break
-                    if is_turn:
-                        break
-            if is_turn:
-                is_ss = False
-                continue
+                # If P1 enters a pause
+                if p1[m] == 2:
+                    p1_pause_start = m
+                    for p in range(p1_pause_start, total_duration):
+                        if p2[p] == 1:  # and P2 immediately follows up
+                            p2_voc_start = p
+                            p1_switching_turns.append((p1_voc_start, p2_voc_start - 1))
+                            n = p2_voc_start
+                            break
+                        elif p1[p] == 1 and p2[p] == 2:  # and P1 resumes vocalizing
+                            n = p
+                            break
+                    break
                 
-        n += 1
-    return p1_voc_turns, p1_ss_turns, p2_voc_turns, p2_ss_turns
+                # Switching turn #2: P1 enters a switching pause
+                elif p1[m] == 3 and p2[m] in (0, 2):
+                    p1_sp_start = m
+                
+                    # Check if the switching pause duration exceeds the allowable duration
+                    pause_dur = 0
+                    while m + pause_dur < total_duration and p1[m + pause_dur] == 3:
+                        pause_dur += 1
+                    if pause_dur > max_pause:
+                        n = m + pause_dur   # skip the entire switching pause sequence
+                        break  # break out of P1's vocalization sequence; don't record any ST
+                        
+                    sp_end = min(p1_sp_start + max_pause, total_duration)
+                    for p in range(p1_sp_start, sp_end):
+                        if p1[p] == 2 and p2[p] == 1:  # if P2 vocalizes in response
+                            p2_voc_start = p
+                            p1_switching_turns.append((p1_voc_start, p2_voc_start - 1))
+                            is_st = True
+                            n = p2_voc_start
+                            break  # break out of P1's switching pause sequence
+                    if is_st:
+                        is_st = False  # reset switching turn flag
+                        break  # break out of P1's switching turn sequence
+                        
+                # Interruptive turn: P2 interjects
+                elif p1[m] == 1 and p2[m] == 5:
+                    p2_it_start = m
+                    # p1_switching_turns.append((p1_voc_start, p2_it_start - 1))
+                    for i in range(p2_it_start, total_duration):
+                        if ((p1[i] in (1, 5) and p2[i] == 1) or       # if P1 vocalizes
+                            (p1[i] in (0, 2) and p2[i] in (2, 3))):   # if P2 stops
+                            p2_it_stop = i
+                            p2_interrupt_turns.append((p2_it_start, p2_it_stop - 1))
+                            is_it = True
+                            n = p2_it_stop
+                            break  # break out of P2's interruptive turn sequence
+                    if is_it:
+                        is_it = False  # reset interruptive turn flag
+                        break  # break out of P1's vocalization sequence
+                    else:
+                        p2_interrupt_turns.append((p2_it_start, total_duration - 1))
+                        n = total_duration
+        
+                else:
+                    n = total_duration
+         
+        else:
+            n += 1
+                
+    return p1_switching_turns, p1_interrupt_turns, p2_switching_turns, p2_interrupt_turns
 
 def extract_features(
     p1: Union[np.ndarray, Sequence[int]], 
