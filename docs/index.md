@@ -1,4 +1,4 @@
-<span style="font-size: 16pt; font-weight: bold">pyvocals 0.1</span>  
+<span style="font-size: 16pt; font-weight: bold">pyvocals 0.1.1</span>  
 
 **pyvocals** is a Python tool for analyzing vocal turn-taking in 
 conversational speech. It extracts structured features from audio files 

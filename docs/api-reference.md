@@ -1,15 +1,14 @@
-<span style="font-size: 18pt; font-weight: bold">API Reference</span>  
+<span style="font-size: 18pt; font-weight: bold">API Reference</span>
 
-This section provides detailed documentation for the functions available in 
-this project. To get started, import the functions using 
+This section provides detailed documentation for the functions available in
+this project. To get started, import the functions using
 <code>import pyvocals</code>.
 
 <br>
 
 # extract_features
 
-<div class="source-link">[<a href="https://github.
-com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L308" 
+<div class="source-link">[<a href="https://github.com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L366" 
 target="_blank">source</a>]</div>
 
 <span class="function-text">extract_features(p1, p2, p1_label = 'Child', 
@@ -68,7 +67,7 @@ partner's time series of extracted vocal states and turn-taking features.</div>
 # preprocess_audio()
 
 <div class="source-link">[<a href="https://github.
-com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L9" target="_blank">source</a>]</div>
+com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L10" target="_blank">source</a>]</div>
 
 <span class="function-text">preprocess_audio(file, start_time = None, 
 target_fs = 4)</span>
@@ -97,8 +96,7 @@ pre-processed vocalization signal.</div>
 # get_vocal_states()
 
 <div class="source-link">[<a href="https://github.
-com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L56" 
-target="_blank">source</a>]</div>
+com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L57" target="_blank">source</a>]</div>
 
 <span class="function-text">get_vocal_states(p1, p2, p1_label = 'Child', 
 p2_label = 'Parent', start_time = None, fs = None)</span>
@@ -179,13 +177,13 @@ Jaffe, J., & Feldstein, S. (1970). Rhythms of dialogue. Academic Press.
 # find_vocal_turns()
 
 <div class="source-link">[<a href="https://github.
-com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L174" 
+com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L175" 
 target="_blank">source</a>]</div>
 
 <span class="function-text">find_vocal_turns(p1, p2, fs = 4, 
 max_pause_duration = 5)</span>
 
-Identify indices of when each person's vocal and simultaneous speech turns 
+Identify indices of when each person's switching and interruptive turns 
 begin and end.
 
 ### Parameters
@@ -206,27 +204,25 @@ default, 5.</div>
 ### Returns
 <font color="#8c9f87">**tuple:**</font> 
 
-**p1_voc_turns** (_list_)
+**p1_switching_turns** (_list_)
 <div id="api-param-desc">A list of tuples containing indices denoting the 
-start and end of the first partner's vocal turns.</div>
-**p1_ss_turns** (_list_)
+start and end of the first partner's switching turns.</div>
+**p1_interrupt_turns** (_list_)
 <div id="api-param-desc">A list of tuples containing indices denoting the 
-start and end of the first partner's simultaneous speech turns.</div>
-**p2_voc_turns** (_list_)
+start and end of the first partner's interruptive turns.</div>
+**p2_switching_turns** (_list_)
 <div id="api-param-desc">A list of tuples containing indices denoting the 
-start and end of the second partner's vocal turns.</div>
-**p2_ss_turns** (_list_)
+start and end of the second partner's switching turns.</div>
+**p2_interrupt_turns** (_list_)
 <div id="api-param-desc" class="last">A list of tuples containing indices 
-denoting the start and end of the second partner's simultaneous speech 
-turns.</div>
+denoting the start and end of the second partner's interruptive turns.</div>
 
 <hr>
 
 # find_pauses()
 
 <div class="source-link">[<a href="https://github.
-com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L494" 
-target="_blank">source</a>]</div>
+com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L543" target="_blank">source</a>]</div>
 
 <span class="function-text">find_pauses(p1, p2)</span>
 
@@ -254,8 +250,7 @@ second partner's pauses.</div>
 # find_switching_pauses()
 
 <div class="source-link">[<a href="https://github.
-com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L561" 
-target="_blank">source</a>]</div>
+com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L610" target="_blank">source</a>]</div>
 
 <span class="function-text">find_switching_pauses(p1, p2)</span>
 
@@ -287,8 +282,7 @@ second partner's switching pauses.</div>
 # find_simultaneous_speech()
 
 <div class="source-link">[<a href="https://github.
-com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L650" 
-target="_blank">source</a>]</div>
+com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L699" target="_blank">source</a>]</div>
 
 <span class="function-text">find_simultaneous_speech(p1, p2)</span>
 
@@ -325,8 +319,7 @@ second partner's NSS occurrences.</div>
 # plot_vocals()
 
 <div class="source-link">[<a href="https://github.
-com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L388" 
-target="_blank">source</a>]</div>
+com/nmy2103/pyvocals/blob/main/pyvocals/pyvocals.py#L440" target="_blank">source</a>]</div>
 
 <span class="function-text">plot_vocals(p1, p2, fs, seg_num = 1, seg_size = 
 15, p1_label = 'Child', p2_label = 'Parent')</span>
